@@ -32,7 +32,7 @@ export async function createTodo(idToken, newTodo) {
 
 export async function patchTodo(idToken, todoId, updatedTodo) {
   await Axios.patch(
-    `${process.env.REACT_APP_API_ENDPOINT}/todos/${todoId}`,
+    `https://${process.env.REACT_APP_API_ENDPOINT}/todos/${todoId}`,
     JSON.stringify(updatedTodo),
     {
       headers: {

@@ -46,6 +46,7 @@ async function verifyToken(authHeader) {
   const token = getToken(authHeader)
   const jwt = jsonwebtoken.decode(token, { complete: true })
 
+  console.log('JWT', jwt);
   // TODO: Implement token verification
   return undefined;
 }

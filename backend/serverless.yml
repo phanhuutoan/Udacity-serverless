@@ -10,19 +10,32 @@ frameworkVersion: '3'
 provider:
   name: aws
   runtime: nodejs14.x
+  stage: ${opt:stage, 'dev'}
+  region: 'us-east-1'
+  environment:
+      TODOS_TABLE: Todos-${self:provider.stage}
+      TODOS_CREATED_AT_INDEX: CreatedAtIndex
 
 functions:
+  Auth:
+    handler: src/lambda/auth/auth0Authorizer.handler
 
-  # Auth:
-  #   handler: src/lambda/auth/auth0Authorizer.handler
-
-#   # TODO: Configure this function
-#   GetTodos:
-#     handler: src/lambda/http/getTodos.handler
-#     events:
-#       - http:
-#           method: get
-#           path: todos
+  GetTodos:
+    handler: src/lambda/http/getTodos.handler
+    events:
+      - http:
+          method: get
+          path: todos
+          cors: true
+          authorizer: Auth
+    iamRoleStatementsInherit: true
+    # iamRoleStatements:
+    #   - Effect: Allow
+    #     Action:
+    #       - dynamodb:GetItem
+    #       - dynamodb:UpdateItem
+    #       - dynamodb:PutItem
+    #     Resource: arn:aws:dynamodb:${self:provider.environment.TODOS_TABLE}
 
   CreateTodo:
     handler: src/lambda/http/createTodo.handler
@@ -30,6 +43,7 @@ functions:
       - http:
           method: post
           path: todos
+          cors: true
 
 #   # TODO: Configure this function
 #   UpdateTodo:
@@ -55,6 +69,32 @@ functions:
 #           method: post
 #           path: todos/{todoId}/attachment
 
-# resources:
-#   Resources:
-    # TODO: Add any necessary AWS resources
+resources:
+  Resources:
+    TodosTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: todoId
+          AttributeType: S
+        - AttributeName: createdAt
+          AttributeType: S
+        KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+        - AttributeName: todoId
+          KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:provider.environment.TODOS_TABLE}
+        LocalSecondaryIndexes:
+        - IndexName: ${self:provider.environment.TODOS_CREATED_AT_INDEX}
+          KeySchema:
+            - AttributeName: userId
+              KeyType: HASH
+            - AttributeName: createdAt
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL # What attributes will be copied to an index
+    
