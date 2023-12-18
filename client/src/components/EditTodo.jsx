@@ -2,7 +2,7 @@ import { useAuth0 } from '@auth0/auth0-react'
 import React, { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Button, Form } from 'semantic-ui-react'
-import { getUploadUrl, uploadFile } from '../api/todos-api'
+import { getUploadUrl, patchTodo, uploadFile } from '../api/todos-api'
 
 const UploadState = {
   NoUpload: 'NoUpload',
@@ -43,7 +43,7 @@ export function EditTodo() {
 
       setUploadState(UploadState.FetchingPresignedUrl)
       const accessToken = await getAccessTokenSilently({
-        audience: `https://test-endpoint.auth0.com/api/v2/`,
+        audience: `https://${process.env.REACT_APP_AUTH0_DOMAIN}/api/v2/`,
         scope: 'write:todos'
       })
       const uploadUrl = await getUploadUrl(accessToken, todoId)
@@ -52,6 +52,8 @@ export function EditTodo() {
       await uploadFile(uploadUrl, file)
 
       alert('File was uploaded!')
+
+      await patchTodo(accessToken, todoId, {attachmentUrl: uploadUrl})
     } catch (e) {
       alert('Could not upload a file: ' + e.message)
     } finally {

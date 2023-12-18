@@ -1,7 +1,18 @@
-export function handler(event) {
-  const todoId = event.pathParameters.todoId
+import middy from '@middy/core'
+import cors from '@middy/http-cors'
+import httpErrorHandler from '@middy/http-error-handler'
+import { getPresignedUrl } from '../../storageLayer/attachmentUtil.mjs'
 
-  // TODO: Return a presigned URL to upload a file for a TODO item with the provided id
-  return undefined
-}
+export const handler = middy()
+  .use(httpErrorHandler())
+  .use(cors({ credentials: true }))
+  .handler(async () => {
+    const uploadUrl = await getPresignedUrl()
 
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        uploadUrl
+      })
+    }
+  })

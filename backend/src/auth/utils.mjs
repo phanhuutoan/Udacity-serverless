@@ -11,3 +11,16 @@ export function parseUserId(jwtToken) {
   const decodedJwt = decode(jwtToken)
   return decodedJwt.sub
 }
+
+export const RESPONSE_STATUS = {
+  SUCCESS: 200,
+  BAD_REQUEST:400,
+  SERVER_ERROR: 500,
+}
+
+export function httpResponse(data, status = RESPONSE_STATUS.SUCCESS) {
+  return {
+    statusCode: status,
+    body: JSON.stringify(data)
+  }
+}

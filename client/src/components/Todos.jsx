@@ -26,7 +26,7 @@ export function Todos() {
   }
 
   function renderTodosList() {
-    return (
+    return todos.length > 0 ? (
       <Grid padded>
         {todos.map((todo, pos) => {
           return (
@@ -71,6 +71,10 @@ export function Todos() {
           )
         })}
       </Grid>
+    ) : (
+      <div style={{margin: "3rem"}}>
+        <h2>Empty todos list</h2>
+      </div>
     )
   }
 
