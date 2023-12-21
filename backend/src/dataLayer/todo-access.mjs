@@ -24,16 +24,15 @@ export const listItems = async (userId) => {
 }
 
 export const createItem = async (payload, userId) => {
+  const bucketName = 'images-bucket-tony-051299-uda'
   const { name, dueDate } = payload
   const uuid = generateUUID()
-  const defaultImage =
-    'https://imgupscaler.com/images/samples/animal-after.webp'
   const item = {
     userId,
     todoId: uuid,
     name,
     dueDate,
-    attachmentUrl: defaultImage,
+    attachmentUrl: `https://${bucketName}.s3.amazonaws.com/${uuid}`,
     done: false,
     createdAt: new Date().toISOString()
   }
@@ -47,19 +46,28 @@ export const createItem = async (payload, userId) => {
   return item
 }
 
+export const getItem = async (userId, todoId) => {
+  var params = {
+    TableName : TABLE_NAME,
+    Key: {
+      todoId,
+      userId,
+    }
+  };
+  
+  const res = await documentClient.get(params)
+  return res.Item
+}
+
 export const updateItem = async (payload) => {
-  const {done, attachmentUrl, userId, todoId} = payload;
+  const {done, userId, name, todoId, dueDate} = payload;
+  const existingItem = await getItem(userId, todoId)
+
   const item = {
-    userId,
-    todoId,
-  }
-
-  if (done !== undefined) {
-    item.done = done
-  }
-
-  if (attachmentUrl !== undefined) {
-    item.attachmentUrl = attachmentUrl
+    ...existingItem,
+    name,
+    dueDate,
+    done
   }
 
   var params = {
@@ -68,4 +76,5 @@ export const updateItem = async (payload) => {
   }
 
   await documentClient.put(params)
+  return item
 }

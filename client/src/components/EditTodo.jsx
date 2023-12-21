@@ -53,7 +53,7 @@ export function EditTodo() {
 
       alert('File was uploaded!')
 
-      await patchTodo(accessToken, todoId, {attachmentUrl: uploadUrl})
+      // await patchTodo(accessToken, todoId, {attachmentUrl: uploadUrl})
     } catch (e) {
       alert('Could not upload a file: ' + e.message)
     } finally {

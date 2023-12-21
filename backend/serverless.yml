@@ -72,7 +72,7 @@ functions:
     iamRoleStatements:
       - Effect: Allow
         Action:
-          - dynamodb:DeleteItem
+          - dynamodb:UpdateItem
         Resource: arn:aws:dynamodb:${self:provider.region}:323184664706:table/${self:provider.environment.TODOS_TABLE}
 
 
@@ -153,6 +153,8 @@ resources:
                 - GET
                 - PUT
                 - DELETE
+              AllowedHeaders:
+                - '*'
               AllowedOrigins:
                 - "*"
         PublicAccessBlockConfiguration:
