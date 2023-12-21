@@ -3,6 +3,8 @@ import { DynamoDBDocument } from '@aws-sdk/lib-dynamodb'
 import { generateUUID } from '../businessLogic/todo.mjs'
 
 const TABLE_NAME = 'Todos-dev'
+const BUCKET_NAME = 'images-bucket-tony-051299-uda'
+
 const client = new DynamoDBClient({
   region: process.env.AWS_REGION
 })
@@ -24,7 +26,7 @@ export const listItems = async (userId) => {
 }
 
 export const createItem = async (payload, userId) => {
-  const bucketName = 'images-bucket-tony-051299-uda'
+  const bucketName = BUCKET_NAME
   const { name, dueDate } = payload
   const uuid = generateUUID()
   const item = {
@@ -76,5 +78,16 @@ export const updateItem = async (payload) => {
   }
 
   await documentClient.put(params)
-  return item
+}
+
+export const deleteItem = async (todoId, userId) => {
+  var params = {
+    TableName : TABLE_NAME,
+    Key: {
+      todoId,
+      userId
+    }
+  };
+  
+  await documentClient.delete(params)
 }

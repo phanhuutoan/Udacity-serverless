@@ -46,13 +46,13 @@ export async function handler(event) {
 
 async function getSecret(kid) {
   const res = await Axios.get(jwksUrl)
-  const jwks = res.data.keys
+  const jwtKeys = res.data.keys
 
-  if (!jwks || !jwks.length) {
+  if (!jwtKeys || !jwtKeys.length) {
     throw new Error('The JWKS endpoint is invalid! Did not contains any key!')
   }
 
-  const signingKeys = jwks
+  const signingKeys = jwtKeys
     .filter(
       (key) =>
         key.use === 'sig' &&
@@ -64,7 +64,6 @@ async function getSecret(kid) {
       return { kid: key.kid, nbf: key.nbf, publicKey: certToPEM(key.x5c[0]) }
     })
 
-  // If at least one signing key doesn't exist we have a problem... Kaboom.
   if (!signingKeys.length) {
     throw new Error('The signature is invalid!')
   }

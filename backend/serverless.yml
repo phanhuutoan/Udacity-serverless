@@ -73,18 +73,26 @@ functions:
       - Effect: Allow
         Action:
           - dynamodb:UpdateItem
+          - dynamodb:GetItem
+          - dynamodb:PutItem
+        Resource: arn:aws:dynamodb:${self:provider.region}:323184664706:table/${self:provider.environment.TODOS_TABLE}
+
+  DeleteTodo:
+    handler: src/lambda/http/deleteTodo.handler
+    events:
+      - http:
+          method: delete
+          path: todos/{todoId}
+          cors: true
+          authorizer: Auth
+    iamRoleStatementsInherit: true
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:DeleteItem
         Resource: arn:aws:dynamodb:${self:provider.region}:323184664706:table/${self:provider.environment.TODOS_TABLE}
 
 
-#   # TODO: Configure this function
-#   DeleteTodo:
-#     handler: src/lambda/http/deleteTodo.handler
-#     events:
-#       - http:
-#           method: delete
-#           path: todos/{todoId}
-
-  # TODO: Configure this function
   GenerateUploadUrl:
     handler: src/lambda/http/generateUploadUrl.handler
     events:
